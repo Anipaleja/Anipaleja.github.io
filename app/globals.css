@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f3f3ed;
+  --surface: #ffe56a;
+  --surface-alt: #ff7a59;
+  --text: #111111;
+  --muted: #2b2b2b;
+  --accent: #0059ff;
+  --line: #111111;
+}
+
+body {
+  color: var(--text);
+  background-color: var(--bg);
+  font-family: var(--font-body), sans-serif;
+  line-height: 1.45;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 36px 36px;
+  z-index: 1;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), serif;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: #ffe56a;
+}
+
+.section-shell {
+  width: min(1160px, 92vw);
+  margin-inline: auto;
+}
+
+.eyebrow {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.display-xl {
+  font-size: clamp(3.2rem, 9vw, 8rem);
+  line-height: 0.88;
+}
+
+.display-lg {
+  font-size: clamp(2.3rem, 6.2vw, 5rem);
+  line-height: 0.92;
+}
+
+.grain-surface {
+  background: var(--surface);
+  border: 3px solid var(--line);
+  box-shadow: 8px 8px 0 var(--line);
+}
+
+.warm-card {
+  background: #f7f7f2;
+  border: 3px solid var(--line);
+  box-shadow: 6px 6px 0 var(--line);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.warm-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 10px 10px 0 var(--line);
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.25rem;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 260ms ease;
+  background-color: var(--line);
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.stagger-in {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 580ms ease forwards;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cursor-dot {
+  position: fixed;
+  width: 12px;
+  height: 12px;
+  border-radius: 0;
+  background: var(--accent);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 70;
+  border: 2px solid var(--line);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
