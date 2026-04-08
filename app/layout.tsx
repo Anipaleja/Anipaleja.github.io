@@ -15,9 +15,12 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Anish Paleja | Warm Engineer",
+  title: "Anish Paleja",
   description:
     "Personal website of Anish Paleja, building at the intersection of AI, robotics, and infrastructure.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
