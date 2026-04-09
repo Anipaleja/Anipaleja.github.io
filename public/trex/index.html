@@ -604,6 +604,13 @@
     this.highestScore = Math.ceil(this.distanceRan);
     this.distanceMeter.setHighScore(this.highestScore);
     }
+    try {
+    window.parent.postMessage({
+    type: 'trex-game-over',
+    score: this.distanceMeter.getActualDistance(this.distanceRan)
+    }, window.location.origin);
+    } catch (error) {
+    }
     // Reset the time clock.
     this.time = getTimeStamp();
     },

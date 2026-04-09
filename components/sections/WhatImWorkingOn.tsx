@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 import { blogPosts, personal, socialLinks } from "@/lib/content";
 
 type GitHubRepo = {
@@ -38,13 +39,18 @@ type MediumPost = {
 };
 
 const USERNAME = "anipaleja";
-const MAX_COMMITS = 15;
+const MAX_COMMITS = 4;
 const REPO_SAMPLE_SIZE = 6;
 const COMMITS_PER_REPO = 5;
 const THEME_STORAGE_KEY = "ap-theme";
 const EFFECT_STORAGE_KEY = "ap-grid-effect";
 const CLICKS_STORAGE_KEY = "ap-click-count";
+const CLICKS_COUNTER_KEY = "site_clicks";
 const MEDIUM_FEED_URL = "https://medium.com/feed/@anipaleja";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const supabase =
+  supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 type ThemePreset = {
   id: "latte" | "frappe" | "macchiato" | "mocha";
@@ -220,6 +226,58 @@ function formatTimeInToronto(date: Date): string {
   }).format(date);
 }
 
+function toClickCount(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  return 0;
+}
+
+async function loadGlobalClickCount(): Promise<number> {
+  if (!supabase) {
+    return toClickCount(window.localStorage.getItem(CLICKS_STORAGE_KEY));
+  }
+
+  const { data, error } = await supabase
+    .from("site_counters")
+    .select("counter_value")
+    .eq("counter_key", CLICKS_COUNTER_KEY)
+    .maybeSingle();
+
+  if (error || !data) {
+    return toClickCount(window.localStorage.getItem(CLICKS_STORAGE_KEY));
+  }
+
+  return toClickCount(data.counter_value);
+}
+
+async function incrementGlobalClickCount(): Promise<number> {
+  if (!supabase) {
+    const nextCount = toClickCount(window.localStorage.getItem(CLICKS_STORAGE_KEY)) + 1;
+    window.localStorage.setItem(CLICKS_STORAGE_KEY, String(nextCount));
+    return nextCount;
+  }
+
+  const { data, error } = await supabase.rpc("increment_site_counter", {
+    target_key: CLICKS_COUNTER_KEY,
+  });
+
+  if (error || typeof data !== "number") {
+    const nextCount = toClickCount(window.localStorage.getItem(CLICKS_STORAGE_KEY)) + 1;
+    window.localStorage.setItem(CLICKS_STORAGE_KEY, String(nextCount));
+    return nextCount;
+  }
+
+  window.localStorage.setItem(CLICKS_STORAGE_KEY, String(data));
+  return data;
+}
+
 export function WhatImWorkingOn() {
   const [recentCommits, setRecentCommits] = useState<RecentCommit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -233,20 +291,35 @@ export function WhatImWorkingOn() {
   useEffect(() => {
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemePreset["id"] | null;
     const storedEffect = window.localStorage.getItem(EFFECT_STORAGE_KEY);
-    const storedClicks = window.localStorage.getItem(CLICKS_STORAGE_KEY);
 
     const nextTheme: ThemePreset["id"] = themePresets.some((preset) => preset.id === storedTheme)
       ? (storedTheme as ThemePreset["id"])
       : "latte";
     const nextEffect = storedEffect === null ? true : storedEffect === "on";
-    const nextClicks = Number.parseInt(storedClicks ?? "0", 10);
 
     setTheme(nextTheme);
     setGridEffectOn(nextEffect);
-    setClickCount(Number.isNaN(nextClicks) ? 0 : nextClicks);
 
     document.documentElement.dataset.theme = nextTheme;
     document.body.dataset.grid = nextEffect ? "on" : "off";
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadClicks = async () => {
+      const nextClicks = await loadGlobalClickCount();
+
+      if (isMounted) {
+        setClickCount(nextClicks);
+      }
+    };
+
+    void loadClicks();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -442,7 +515,10 @@ export function WhatImWorkingOn() {
           <p className="mt-3 text-5xl font-semibold leading-none text-[var(--text)]">{clickCount.toLocaleString()}</p>
           <button
             type="button"
-            onClick={() => setClickCount((value) => value + 1)}
+            onClick={async () => {
+              const nextCount = await incrementGlobalClickCount();
+              setClickCount(nextCount);
+            }}
             className="mt-5 border-[3px] border-[var(--line)] bg-[var(--surface-alt)] px-6 py-3 text-sm font-semibold uppercase text-[#f7f7f2] shadow-[4px_4px_0_0_#111111] transition hover:translate-x-[-2px] hover:translate-y-[-2px]"
           >
             Click me

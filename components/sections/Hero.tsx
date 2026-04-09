@@ -59,16 +59,6 @@ export function Hero() {
           </motion.span>
         </div>
       </motion.div>
-
-      <div className="absolute bottom-8 left-0 flex items-center gap-3 border-2 border-[var(--line)] bg-[#f7f7f2] px-3 py-1 text-xs font-semibold uppercase text-[var(--text)]">
-        <span className="h-1 w-10 bg-[var(--line)]" />
-        <motion.span
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-        >
-          scroll
-        </motion.span>
-      </div>
     </section>
   );
 }
