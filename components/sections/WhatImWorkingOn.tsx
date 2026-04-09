@@ -46,6 +46,8 @@ const THEME_STORAGE_KEY = "ap-theme";
 const EFFECT_STORAGE_KEY = "ap-grid-effect";
 const CLICKS_STORAGE_KEY = "ap-click-count";
 const CLICKS_COUNTER_KEY = "site_clicks";
+const ACCENT_STORAGE_KEY = "ap-accent-color";
+const GRAPH_COLOR_STORAGE_KEY = "ap-graph-color";
 const MEDIUM_FEED_URL = "https://medium.com/feed/@anipaleja";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
@@ -61,25 +63,29 @@ type ThemePreset = {
 const themePresets: ThemePreset[] = [
   {
     id: "latte",
-    label: "Latte",
+    label: "Blueprint",
     swatches: ["#f3f3ed", "#ffe56a", "#ff7a59", "#0059ff"],
   },
   {
     id: "frappe",
-    label: "Frappe",
+    label: "Lagoon",
     swatches: ["#f4f1e6", "#7dd2ff", "#58b38f", "#15416d"],
   },
   {
     id: "macchiato",
-    label: "Macchiato",
+    label: "Sunset",
     swatches: ["#fff0df", "#ff8a5c", "#d1495b", "#293241"],
   },
   {
     id: "mocha",
-    label: "Mocha",
+    label: "Nebula",
     swatches: ["#171b2a", "#6fb4ff", "#ceb9ff", "#f4f5ff"],
   },
 ];
+
+function getThemePreset(themeId: ThemePreset["id"]): ThemePreset {
+  return themePresets.find((preset) => preset.id === themeId) ?? themePresets[0];
+}
 
 async function getRecentCommits(): Promise<RecentCommit[]> {
   try {
@@ -239,6 +245,10 @@ function toClickCount(value: unknown): number {
   return 0;
 }
 
+function isHexColor(value: string): boolean {
+  return /^#[0-9A-Fa-f]{6}$/.test(value);
+}
+
 async function loadGlobalClickCount(): Promise<number> {
   if (!supabase) {
     return toClickCount(window.localStorage.getItem(CLICKS_STORAGE_KEY));
@@ -285,22 +295,37 @@ export function WhatImWorkingOn() {
   const [gridEffectOn, setGridEffectOn] = useState(true);
   const [torontoTime, setTorontoTime] = useState("--:--:--");
   const [clickCount, setClickCount] = useState(0);
+  const [accentColor, setAccentColor] = useState("#0059ff");
+  const [graphColor, setGraphColor] = useState("#0059ff");
+  const [accentDraft, setAccentDraft] = useState("#0059ff");
+  const [graphDraft, setGraphDraft] = useState("#0059ff");
   const [mediumPosts, setMediumPosts] = useState<MediumPost[]>([]);
   const [isMediumLoading, setIsMediumLoading] = useState(true);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemePreset["id"] | null;
     const storedEffect = window.localStorage.getItem(EFFECT_STORAGE_KEY);
+    const storedAccent = window.localStorage.getItem(ACCENT_STORAGE_KEY);
+    const storedGraphColor = window.localStorage.getItem(GRAPH_COLOR_STORAGE_KEY);
 
     const nextTheme: ThemePreset["id"] = themePresets.some((preset) => preset.id === storedTheme)
       ? (storedTheme as ThemePreset["id"])
       : "latte";
     const nextEffect = storedEffect === null ? true : storedEffect === "on";
+    const defaultAccent = getThemePreset(nextTheme).swatches[3] ?? "#0059ff";
+    const nextAccent = storedAccent && /^#[0-9A-Fa-f]{6}$/.test(storedAccent) ? storedAccent : defaultAccent;
+    const nextGraphColor =
+      storedGraphColor && /^#[0-9A-Fa-f]{6}$/.test(storedGraphColor) ? storedGraphColor : nextAccent;
 
     setTheme(nextTheme);
     setGridEffectOn(nextEffect);
+    setAccentColor(nextAccent);
+    setGraphColor(nextGraphColor);
+    setAccentDraft(nextAccent);
+    setGraphDraft(nextGraphColor);
 
     document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.style.setProperty("--accent", nextAccent);
     document.body.dataset.grid = nextEffect ? "on" : "off";
   }, []);
 
@@ -389,6 +414,17 @@ export function WhatImWorkingOn() {
   }, [theme]);
 
   useEffect(() => {
+    document.documentElement.style.setProperty("--accent", accentColor);
+    window.localStorage.setItem(ACCENT_STORAGE_KEY, accentColor);
+    setAccentDraft(accentColor);
+  }, [accentColor]);
+
+  useEffect(() => {
+    window.localStorage.setItem(GRAPH_COLOR_STORAGE_KEY, graphColor);
+    setGraphDraft(graphColor);
+  }, [graphColor]);
+
+  useEffect(() => {
     document.body.dataset.grid = gridEffectOn ? "on" : "off";
     window.localStorage.setItem(EFFECT_STORAGE_KEY, gridEffectOn ? "on" : "off");
   }, [gridEffectOn]);
@@ -446,7 +482,12 @@ export function WhatImWorkingOn() {
               <button
                 key={preset.id}
                 type="button"
-                onClick={() => setTheme(preset.id)}
+                onClick={() => {
+                  const defaultAccent = preset.swatches[3] ?? "#0059ff";
+                  setTheme(preset.id);
+                  setAccentColor(defaultAccent);
+                  setGraphColor(defaultAccent);
+                }}
                 className={`border-2 px-3 py-2 text-left text-sm font-semibold transition ${
                   theme === preset.id
                     ? "border-[var(--line)] bg-[var(--surface)] text-[var(--text)]"
@@ -467,6 +508,88 @@ export function WhatImWorkingOn() {
                   style={{ backgroundColor: swatch }}
                 />
               ))}
+          </div>
+          <div className="mt-4 grid gap-2 border-2 border-[var(--line)] bg-[var(--bg)] p-3">
+            <div className="flex items-center justify-between text-sm font-semibold text-[var(--text)]">
+              <span>Accent color</span>
+              <span>{accentColor.toUpperCase()}</span>
+            </div>
+            <input
+              type="color"
+              value={accentColor}
+              onChange={(event) => setAccentColor(event.target.value)}
+              className="h-9 w-full cursor-pointer border-2 border-[var(--line)] bg-white"
+              aria-label="Set accent color"
+            />
+            <div className="grid gap-1">
+              <label htmlFor="accent-hex" className="text-xs font-semibold uppercase text-[var(--muted)]">
+                Accent hex
+              </label>
+              <input
+                id="accent-hex"
+                type="text"
+                value={accentDraft}
+                onChange={(event) => setAccentDraft(event.target.value)}
+                onBlur={() => {
+                  if (isHexColor(accentDraft)) {
+                    setAccentColor(accentDraft.toLowerCase());
+                    return;
+                  }
+
+                  setAccentDraft(accentColor);
+                }}
+                placeholder="#0059ff"
+                className="border-2 border-[var(--line)] bg-white px-2 py-1 text-sm font-semibold uppercase"
+                aria-label="Accent color hex code"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const defaultAccent = getThemePreset(theme).swatches[3] ?? "#0059ff";
+                setAccentColor(defaultAccent);
+                setGraphColor(defaultAccent);
+              }}
+              className="border-2 border-[var(--line)] bg-[#f7f7f2] px-3 py-2 text-xs font-semibold uppercase"
+            >
+              Reset accent and graph to theme default
+            </button>
+          </div>
+
+          <div className="mt-3 grid gap-2 border-2 border-[var(--line)] bg-[var(--bg)] p-3">
+            <div className="flex items-center justify-between text-sm font-semibold text-[var(--text)]">
+              <span>Contribution graph color</span>
+              <span>{graphColor.toUpperCase()}</span>
+            </div>
+            <input
+              type="color"
+              value={graphColor}
+              onChange={(event) => setGraphColor(event.target.value)}
+              className="h-9 w-full cursor-pointer border-2 border-[var(--line)] bg-white"
+              aria-label="Set contribution graph color"
+            />
+            <div className="grid gap-1">
+              <label htmlFor="graph-hex" className="text-xs font-semibold uppercase text-[var(--muted)]">
+                Graph hex
+              </label>
+              <input
+                id="graph-hex"
+                type="text"
+                value={graphDraft}
+                onChange={(event) => setGraphDraft(event.target.value)}
+                onBlur={() => {
+                  if (isHexColor(graphDraft)) {
+                    setGraphColor(graphDraft.toLowerCase());
+                    return;
+                  }
+
+                  setGraphDraft(graphColor);
+                }}
+                placeholder="#0059ff"
+                className="border-2 border-[var(--line)] bg-white px-2 py-1 text-sm font-semibold uppercase"
+                aria-label="Contribution graph color hex code"
+              />
+            </div>
           </div>
           <button
             type="button"
@@ -610,7 +733,7 @@ export function WhatImWorkingOn() {
         <div className="mt-4 overflow-x-auto rounded border-2 border-[var(--line)] bg-white p-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`https://ghchart.rshah.org/0059ff/${USERNAME}`}
+            src={`https://ghchart.rshah.org/${graphColor.replace("#", "")}/${USERNAME}`}
             alt="GitHub contribution graph for anipaleja"
             className="h-auto min-w-[680px] max-w-none"
             loading="lazy"
