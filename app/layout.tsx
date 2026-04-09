@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { AnimatedNav } from "@/components/ui/AnimatedNav";
+import { CursorDot } from "@/components/ui/CursorDot";
+import { SiteFooter } from "@/components/ui/SiteFooter";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -30,7 +33,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${cormorant.variable} ${dmSans.variable}`}>{children}</body>
+      <body className={`${cormorant.variable} ${dmSans.variable}`}>
+        <div className="flex min-h-screen flex-col">
+          <CursorDot />
+          <AnimatedNav />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </div>
+      </body>
     </html>
   );
 }

@@ -1,22 +1,31 @@
-import { blogPosts } from "@/lib/content";
+import Link from "next/link";
+import { getAllPostsMeta } from "@/lib/blog";
 
 export function Blog() {
+  const posts = getAllPostsMeta().slice(0, 4);
+
   return (
     <section id="blog" className="section-shell py-20">
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 md:items-end">
         <div>
           <p className="eyebrow">Writing</p>
           <h2 className="display-lg mt-3">Notes from the frontier.</h2>
         </div>
+        <div className="md:text-right">
+          <Link
+            href="/blog"
+            className="inline-block border-2 border-[var(--line)] bg-[#f7f7f2] px-3 py-2 text-sm font-semibold text-[var(--text)]"
+          >
+            View all posts
+          </Link>
+        </div>
       </div>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        {blogPosts.map((post, index) => (
-          <a
-            key={post.title}
-            href={post.link}
-            target="_blank"
-            rel="noreferrer"
+        {posts.map((post, index) => (
+          <Link
+            key={post.slug}
+            href={`/blog/${post.slug}`}
             className={`warm-card p-7 ${index % 2 ? "lg:mt-10" : ""}`}
           >
             <p className="eyebrow border-b-2 border-[var(--line)] pb-2 text-[var(--text)]">{post.date}</p>
@@ -34,7 +43,7 @@ export function Blog() {
                 </span>
               ))}
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
