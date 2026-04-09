@@ -8,9 +8,9 @@ export default function BlogPage() {
     <main className="section-shell py-16">
       <div className="grain-surface p-8 md:p-10">
         <p className="eyebrow">Blog</p>
-        <h1 className="display-lg mt-2">Tech notes in markdown.</h1>
+        <h1 className="display-lg mt-2">Tech notes.</h1>
         <p className="mt-4 text-[var(--text)]">
-          Every post in this section is file-based markdown from the repository.
+          My thoughts on AI, robotics, and infrastructure.
         </p>
       </div>
 
