@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description:
     "Personal website of Anish Paleja, building at the intersection of AI, robotics, and infrastructure.",
   icons: {
-    icon: "/icon.svg",
+    icon: "/icon.png",
   },
 };
 
