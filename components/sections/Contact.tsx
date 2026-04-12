@@ -3,6 +3,9 @@
 import { FormEvent, useMemo, useState } from "react";
 import { contactClosing, personal, socialLinks } from "@/lib/content";
 
+const FALLBACK_CONTACT_ENDPOINT =
+  "https://qhfjgwjyddmqobiyjirt.supabase.co/functions/v1/contact";
+
 export function Contact() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -10,6 +13,25 @@ export function Contact() {
   const [website, setWebsite] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [feedback, setFeedback] = useState("");
+
+  const contactEndpoint = useMemo(() => {
+    const explicit = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT?.trim();
+    if (explicit) {
+      return explicit;
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    if (!supabaseUrl) {
+      return FALLBACK_CONTACT_ENDPOINT;
+    }
+
+    try {
+      const origin = new URL(supabaseUrl).origin;
+      return `${origin}/functions/v1/contact`;
+    } catch {
+      return FALLBACK_CONTACT_ENDPOINT;
+    }
+  }, []);
 
   const canSubmit = useMemo(() => {
     return Boolean(name.trim() && email.trim() && message.trim()) && status !== "sending";
@@ -21,7 +43,7 @@ export function Contact() {
     setFeedback("");
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(contactEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

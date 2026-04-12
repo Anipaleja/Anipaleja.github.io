@@ -34,6 +34,8 @@ jobs:
         run: npm ci
 
       - name: Build static site
+        env:
+          NEXT_PUBLIC_CONTACT_ENDPOINT: https://qhfjgwjyddmqobiyjirt.supabase.co/functions/v1/contact
         run: npm run build
 
       - name: Upload Pages artifact
