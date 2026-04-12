@@ -65,6 +65,22 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+export async function GET() {
+  return NextResponse.json(
+    { ok: true, message: "Contact endpoint is ready. Submit the form with POST." },
+    { status: 200 },
+  );
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      Allow: "GET, POST, OPTIONS",
+    },
+  });
+}
+
 export async function POST(request: Request) {
   if (!resend || !resendToEmail) {
     return NextResponse.json(
