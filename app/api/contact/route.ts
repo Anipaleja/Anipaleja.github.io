@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const FIXED_CONTACT_EMAIL = "anipaleja@gmail.com";
+const FIXED_CONTACT_EMAIL = "adityaranawal@gmail.com";
 
 const resendApiKey = process.env.RESEND_API_KEY ?? "";
 const resendFromEmail = FIXED_CONTACT_EMAIL;

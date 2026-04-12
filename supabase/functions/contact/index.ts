@@ -1,6 +1,6 @@
 import { Resend } from "npm:resend@4.4.0";
 
-const FIXED_CONTACT_EMAIL = "anipaleja@gmail.com";
+const FIXED_CONTACT_EMAIL = "adityaranawal@gmail.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
