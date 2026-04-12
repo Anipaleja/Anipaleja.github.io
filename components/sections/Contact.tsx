@@ -56,11 +56,12 @@ export function Contact() {
         }),
       });
 
-      const data = (await response.json()) as { error?: string };
+      const data = (await response.json()) as { error?: string; details?: string };
 
       if (!response.ok) {
         setStatus("error");
-        setFeedback(data.error ?? "Could not send your message. Please try again.");
+        const detailText = data.details ? ` (${data.details})` : "";
+        setFeedback((data.error ?? "Could not send your message. Please try again.") + detailText);
         return;
       }
 

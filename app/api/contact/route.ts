@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+const FIXED_CONTACT_EMAIL = "anipaleja@gmail.com";
+
 const resendApiKey = process.env.RESEND_API_KEY ?? "";
-const resendFromEmail = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
-const resendToEmail = process.env.RESEND_TO_EMAIL ?? "anipaleja@gmail.com";
+const resendFromEmail = FIXED_CONTACT_EMAIL;
+const resendToEmail = FIXED_CONTACT_EMAIL;
 
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
@@ -132,13 +134,23 @@ export async function POST(request: Request) {
     ].join("\n");
 
     // Resend requires a verified sender. Keep visitor email as reply-to.
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: resendFromEmail,
       to: resendToEmail,
       replyTo: email,
       subject,
       text,
     });
+
+    if (error) {
+      return NextResponse.json(
+        {
+          error: "Resend rejected the email request.",
+          details: error.message,
+        },
+        { status: 502 },
+      );
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

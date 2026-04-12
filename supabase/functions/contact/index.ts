@@ -1,5 +1,7 @@
 import { Resend } from "npm:resend@4.4.0";
 
+const FIXED_CONTACT_EMAIL = "anipaleja@gmail.com";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -44,10 +46,10 @@ Deno.serve(async (request) => {
   }
 
   const resendApiKey = Deno.env.get("RESEND_API_KEY") ?? "";
-  const resendToEmail = Deno.env.get("RESEND_TO_EMAIL") ?? "";
-  const resendFromEmail = Deno.env.get("RESEND_FROM_EMAIL") ?? "onboarding@resend.dev";
+  const resendToEmail = FIXED_CONTACT_EMAIL;
+  const resendFromEmail = FIXED_CONTACT_EMAIL;
 
-  if (!resendApiKey || !resendToEmail) {
+  if (!resendApiKey) {
     return new Response(JSON.stringify({ error: "Email service is not configured." }), {
       status: 500,
       headers: {
@@ -108,7 +110,7 @@ Deno.serve(async (request) => {
   }
 
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: resendFromEmail,
       to: resendToEmail,
       reply_to: email,
@@ -121,6 +123,22 @@ Deno.serve(async (request) => {
         message,
       ].join("\n"),
     });
+
+    if (error) {
+      return new Response(
+        JSON.stringify({
+          error: "Resend rejected the email request.",
+          details: error.message,
+        }),
+        {
+          status: 502,
+          headers: {
+            ...corsHeaders,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
