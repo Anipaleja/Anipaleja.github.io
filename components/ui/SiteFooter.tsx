@@ -29,8 +29,8 @@ export function SiteFooter() {
 
   return (
     <footer className="section-shell mt-10 pb-8">
-      <div className="border-4 border-[var(--line)] bg-[var(--surface-alt)] px-4 py-3 shadow-[6px_6px_0_0_#111111]">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-sm font-semibold text-[#f7f7f2]">
+      <div className="border-4 border-[var(--line)] bg-[var(--surface-alt)] px-3 py-3 shadow-[6px_6px_0_0_#111111] sm:px-4">
+        <div className="flex flex-col gap-3 text-sm font-semibold text-[#f7f7f2] sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <p>
             © 2026 {personal.name} • All services nominal • {time}
           </p>

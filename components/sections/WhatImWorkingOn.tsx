@@ -468,7 +468,7 @@ export function WhatImWorkingOn() {
     <section id="working-on" className="section-shell py-10 md:py-16">
       <div className="md:ml-16">
         <p className="eyebrow">What I&apos;m Working On</p>
-        <h2 className="mt-2 text-4xl italic md:text-5xl">Shipping in public, one commit at a time.</h2>
+        <h2 className="mt-2 text-3xl italic sm:text-4xl md:text-5xl">Shipping in public, one commit at a time.</h2>
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -477,7 +477,7 @@ export function WhatImWorkingOn() {
             <p className="eyebrow">Theme</p>
             <span className="text-xs text-[var(--muted)]">{theme}</span>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {themePresets.map((preset) => (
               <button
                 key={preset.id}
@@ -635,7 +635,9 @@ export function WhatImWorkingOn() {
 
         <div className="warm-card p-5 md:p-6 lg:col-span-1">
           <p className="eyebrow">Click Counter</p>
-          <p className="mt-3 text-5xl font-semibold leading-none text-[var(--text)]">{clickCount.toLocaleString()}</p>
+          <p className="mt-3 text-4xl font-semibold leading-none text-[var(--text)] sm:text-5xl">
+            {clickCount.toLocaleString()}
+          </p>
           <button
             type="button"
             onClick={async () => {
@@ -735,7 +737,7 @@ export function WhatImWorkingOn() {
           <img
             src={`https://ghchart.rshah.org/${graphColor.replace("#", "")}/${USERNAME}`}
             alt="GitHub contribution graph for anipaleja"
-            className="h-auto min-w-[680px] max-w-none"
+            className="h-auto min-w-[560px] max-w-none sm:min-w-[680px]"
             loading="lazy"
           />
         </div>

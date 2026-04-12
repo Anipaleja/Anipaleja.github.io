@@ -5,7 +5,7 @@ export function Blog() {
   const posts = getAllPostsMeta().slice(0, 4);
 
   return (
-    <section id="blog" className="section-shell py-20">
+    <section id="blog" className="section-shell py-14 md:py-20">
       <div className="grid gap-6 md:grid-cols-2 md:items-end">
         <div>
           <p className="eyebrow">Writing</p>
@@ -21,15 +21,15 @@ export function Blog() {
         </div>
       </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid gap-5 sm:gap-6 lg:grid-cols-2">
         {posts.map((post, index) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
-            className={`warm-card p-7 ${index % 2 ? "lg:mt-10" : ""}`}
+            className={`warm-card p-6 sm:p-7 ${index % 2 ? "lg:mt-10" : ""}`}
           >
             <p className="eyebrow border-b-2 border-[var(--line)] pb-2 text-[var(--text)]">{post.date}</p>
-            <h3 className="mt-2 text-3xl leading-tight transition-colors hover:text-[var(--accent)]">
+            <h3 className="mt-2 text-2xl leading-tight transition-colors hover:text-[var(--accent)] sm:text-3xl">
               {post.title}
             </h3>
             <p className="mt-4 text-[var(--text)]">{post.excerpt}</p>

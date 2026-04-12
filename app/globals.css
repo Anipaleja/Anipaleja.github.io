@@ -57,6 +57,7 @@ body {
   background-color: var(--bg);
   font-family: var(--font-body), sans-serif;
   line-height: 1.45;
+  overflow-x: clip;
 }
 
 body::before {
@@ -220,5 +221,26 @@ a {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-shell {
+    width: min(1160px, calc(100vw - 1rem));
+  }
+
+  .display-xl {
+    font-size: clamp(2.6rem, 15vw, 5rem);
+    line-height: 0.95;
+  }
+
+  .display-lg {
+    font-size: clamp(2rem, 9vw, 3.25rem);
+    line-height: 0.96;
+  }
+
+  .grain-surface,
+  .warm-card {
+    box-shadow: 4px 4px 0 var(--line);
   }
 }

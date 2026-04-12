@@ -2,11 +2,11 @@ import { contactClosing, personal, socialLinks } from "@/lib/content";
 
 export function Contact() {
   return (
-    <section id="contact" className="section-shell py-20">
-      <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="grain-surface p-8 md:p-10">
+    <section id="contact" className="section-shell py-14 md:py-20">
+      <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
+        <div className="grain-surface p-6 sm:p-8 md:p-10">
           <p className="eyebrow">Contact</p>
-          <h2 className="mt-2 text-5xl italic">Let&apos;s build something worth building.</h2>
+          <h2 className="mt-2 text-3xl italic sm:text-4xl md:text-5xl">Let&apos;s build something worth building.</h2>
           <p className="mt-5 text-[var(--text)]">{contactClosing}</p>
           <div className="mt-8 space-y-3">
             {socialLinks.map((link) => (
@@ -24,7 +24,7 @@ export function Contact() {
           </div>
         </div>
 
-        <form className="self-end pb-3">
+        <form className="self-start pb-3 lg:self-end">
           <p className="eyebrow">Say Hello</p>
           <p className="mt-2 text-sm text-[var(--muted)]">
             {personal.name} - {personal.location}
@@ -53,7 +53,7 @@ export function Contact() {
             </label>
             <button
               type="submit"
-              className="border-[3px] border-[var(--line)] bg-[var(--accent)] px-6 py-2 text-sm font-semibold uppercase text-[#f7f7f2] shadow-[4px_4px_0_0_#111111] transition hover:translate-x-[-2px] hover:translate-y-[-2px]"
+              className="w-full border-[3px] border-[var(--line)] bg-[var(--accent)] px-6 py-2 text-sm font-semibold uppercase text-[#f7f7f2] shadow-[4px_4px_0_0_#111111] transition hover:translate-x-[-2px] hover:translate-y-[-2px] sm:w-auto"
             >
               Send note -&gt;
             </button>

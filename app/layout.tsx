@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${cormorant.variable} ${dmSans.variable}`}>
+      <body className={`${cormorant.variable} ${dmSans.variable} overflow-x-clip`}>
         <div className="flex min-h-screen flex-col">
           <CursorDot />
           <AnimatedNav />

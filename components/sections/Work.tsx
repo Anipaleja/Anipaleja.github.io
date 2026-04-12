@@ -6,9 +6,9 @@ import { projects } from "@/lib/content";
 const allCategories = ["All", ...Array.from(new Set(projects.map((item) => item.category)))];
 
 const sizeClasses = {
-  short: "min-h-[240px]",
-  medium: "min-h-[320px]",
-  tall: "min-h-[400px]",
+  short: "md:min-h-[240px]",
+  medium: "md:min-h-[320px]",
+  tall: "md:min-h-[400px]",
 };
 
 export function Work() {
@@ -22,18 +22,18 @@ export function Work() {
   );
 
   return (
-    <section id="work" className="section-shell py-20">
+    <section id="work" className="section-shell py-14 md:py-20">
       <div className="md:ml-24">
         <p className="eyebrow">Selected Work</p>
         <h2 className="display-lg mt-3 max-w-2xl">Systems worth shipping.</h2>
       </div>
 
-      <div className="mt-8 flex flex-wrap gap-3 md:ml-12">
+      <div className="mt-6 flex flex-wrap gap-2 md:ml-12 md:gap-3">
         {allCategories.map((category) => (
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`border-2 border-[var(--line)] px-4 py-1 text-sm font-semibold uppercase transition ${
+            className={`border-2 border-[var(--line)] px-3 py-2 text-xs font-semibold uppercase transition sm:px-4 sm:py-1 sm:text-sm ${
               activeCategory === category
                 ? "bg-[var(--accent)] text-[#f7f7f2]"
                 : "bg-[#f7f7f2] text-[var(--text)]"
@@ -44,7 +44,7 @@ export function Work() {
         ))}
       </div>
 
-      <div className="mt-10 columns-1 gap-6 md:columns-2">
+      <div className="mt-8 columns-1 gap-5 md:columns-2 md:gap-6">
         {visibleProjects.map((project, index) => (
           <article
             key={project.name}
@@ -53,7 +53,7 @@ export function Work() {
             } ${index % 2 ? "md:-ml-6" : "md:ml-8"}`}
           >
             <p className="eyebrow">{project.category}</p>
-            <h3 className="mt-2 text-3xl">{project.name}</h3>
+            <h3 className="mt-2 text-2xl sm:text-3xl">{project.name}</h3>
             <p className="mt-3 text-sm text-[var(--text)]">{project.description}</p>
             <p className="mt-4 border-t-2 border-dashed border-[var(--line)] pt-3 text-xs font-semibold tracking-wide text-[var(--text)]">
               {project.stack}
@@ -70,7 +70,7 @@ export function Work() {
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-4 text-sm font-semibold uppercase text-[var(--accent)]">
+            <div className="mt-6 flex flex-wrap gap-3 text-xs font-semibold uppercase text-[var(--accent)] sm:text-sm">
               {project.links.map((link) => (
                 <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
                   {link.label}

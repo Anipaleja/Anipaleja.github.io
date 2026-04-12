@@ -164,8 +164,8 @@ export function DinoGame() {
   };
 
   return (
-    <section id="dino-game" className="section-shell py-10 md:py-14">
-      <div className="warm-card p-5 md:p-7">
+    <section id="dino-game" className="section-shell py-8 md:py-14">
+      <div className="warm-card p-4 sm:p-5 md:p-7">
         <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.6fr)] lg:items-start">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
@@ -175,13 +175,13 @@ export function DinoGame() {
               <iframe
                 src="/trex/index.html"
                 title="T-Rex game"
-                className="h-[190px] w-full md:h-[210px]"
+                className="h-[160px] w-full sm:h-[190px] md:h-[210px]"
                 loading="lazy"
               />
             </div>
           </div>
 
-          <aside className="border-2 border-[var(--line)] bg-[#f7f7f2] p-4">
+          <aside className="border-2 border-[var(--line)] bg-[#f7f7f2] p-3 sm:p-4">
             <p className="eyebrow">Leaderboard</p>
             <p className="mt-2 text-sm text-[var(--muted)]">
               Top scores from everyone visiting the site.
@@ -230,7 +230,7 @@ export function DinoGame() {
                 className="border-2 border-[var(--line)] bg-white px-3 py-2 text-base outline-none"
                 maxLength={24}
               />
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   type="submit"
                   className="border-2 border-[var(--line)] bg-[var(--accent)] px-4 py-2 font-semibold text-[#f7f7f2]"
