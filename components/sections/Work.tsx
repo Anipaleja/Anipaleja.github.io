@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { projects } from "@/lib/content";
 
@@ -53,7 +54,11 @@ export function Work() {
             } ${index % 2 ? "md:-ml-6" : "md:ml-8"}`}
           >
             <p className="eyebrow">{project.category}</p>
-            <h3 className="mt-2 text-2xl sm:text-3xl">{project.name}</h3>
+            <h3 className="mt-2 text-2xl sm:text-3xl">
+              <Link href={`/projects/${project.slug}`} className="hover:underline">
+                {project.name}
+              </Link>
+            </h3>
             <p className="mt-3 text-sm text-[var(--text)]">{project.description}</p>
             <p className="mt-4 border-t-2 border-dashed border-[var(--line)] pt-3 text-xs font-semibold tracking-wide text-[var(--text)]">
               {project.stack}
@@ -71,6 +76,7 @@ export function Work() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3 text-xs font-semibold uppercase text-[var(--accent)] sm:text-sm">
+              <Link href={`/projects/${project.slug}`}>View details -&gt;</Link>
               {project.links.map((link) => (
                 <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
                   {link.label}

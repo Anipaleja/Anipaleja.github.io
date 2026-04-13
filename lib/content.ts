@@ -19,8 +19,21 @@ I care about building systems that are not just functional, but genuinely useful
 
 What drives me isn't the tech itself - it's the moment a system does something that surprises even the person who built it.`;
 
-export const projects = [
+export type Project = {
+  slug: string;
+  name: string;
+  stack: string;
+  category: string;
+  description: string;
+  links: Array<{ label: string; href: string }>;
+  tags: string[];
+  size: "short" | "medium" | "tall";
+  learnings: string[];
+};
+
+export const projects: ReadonlyArray<Project> = [
   {
+    slug: "nginx-defender",
     name: "nginx-defender",
     stack: "Go, Docker, Kubernetes, iptables/nftables",
     category: "Infrastructure / Security",
@@ -29,8 +42,14 @@ export const projects = [
     links: [{ label: "Explore ->", href: "https://github.com/Anipaleja/nginx-defender" }],
     tags: ["Go", "Docker", "Kubernetes", "iptables", "Security"],
     size: "tall",
+    learnings: [
+      "Reliable security tooling needs clear detection thresholds and alerting paths.",
+      "Automated blocking is powerful, but you need safeguards to avoid false positives.",
+      "Operational visibility (logs, dashboards, notifications) matters as much as model quality.",
+    ],
   },
   {
+    slug: "illuminator-4-9b",
     name: "iLLuMinator 4.9B",
     stack: "Python, PyTorch, Transformers, RAG, FAISS",
     category: "AI / Machine Learning",
@@ -42,8 +61,14 @@ export const projects = [
     ],
     tags: ["Python", "PyTorch", "Transformers", "LLM", "RAG"],
     size: "tall",
+    learnings: [
+      "Training large models is mostly an optimization and data pipeline problem.",
+      "Small architecture choices can have huge effects on stability and throughput.",
+      "Evaluation and observability are essential; loss alone does not tell the full story.",
+    ],
   },
   {
+    slug: "robotic-ai-arm",
     name: "Robotic AI Arm",
     stack: "Python, Raspberry Pi, OpenCV, EMG Sensors, RPi.GPIO",
     category: "Robotics / Hardware",
@@ -52,8 +77,14 @@ export const projects = [
     links: [{ label: "Explore ->", href: "https://github.com/Anipaleja/Robotic-AI-Arm" }],
     tags: ["Python", "Raspberry Pi", "EMG", "OpenCV", "Robotics"],
     size: "medium",
+    learnings: [
+      "Hardware-software integration takes more iteration than model development alone.",
+      "Sensor noise handling and calibration can make or break real-time control.",
+      "User safety and predictable fallback behavior are non-negotiable in robotics.",
+    ],
   },
   {
+    slug: "nhl-outcome-predictor",
     name: "NHL Outcome Predictor",
     stack: "Python, Neural Networks, Scikit-learn",
     category: "Machine Learning / Sports Analytics",
@@ -67,8 +98,14 @@ export const projects = [
     ],
     tags: ["Python", "Machine Learning", "Neural Networks", "Sports Analytics"],
     size: "short",
+    learnings: [
+      "Feature quality often matters more than model complexity.",
+      "Solid preprocessing and evaluation pipelines prevent misleading results.",
+      "Domain context improves model framing and decision usefulness.",
+    ],
   },
   {
+    slug: "vivirion",
     name: "Vivirion",
     stack: "Startup / Web",
     category: "Startup / Web",
@@ -77,8 +114,14 @@ export const projects = [
     links: [{ label: "Explore ->", href: "https://vivirion.com" }],
     tags: ["Startup", "Web", "Product"],
     size: "short",
+    learnings: [
+      "Product velocity comes from fast feedback loops with real users.",
+      "Balancing shipping speed with maintainability is a daily tradeoff.",
+      "Clear ownership and scope boundaries help teams move faster.",
+    ],
   },
   {
+    slug: "biobuddy-ai",
     name: "BioBuddy AI",
     stack: "AI / Biotech Startup",
     category: "AI / Biotech Startup",
@@ -87,8 +130,17 @@ export const projects = [
     links: [{ label: "Explore ->", href: "https://github.com/BioBuddyAi-Inc" }],
     tags: ["AI", "Biotech", "Startup"],
     size: "short",
+    learnings: [
+      "Translating AI ideas into biotech workflows requires strong problem framing.",
+      "Early stakeholder alignment is critical in health-related products.",
+      "Simple, dependable features beat flashy prototypes in real-world adoption.",
+    ],
   },
-] as const;
+];
+
+export function getProjectBySlug(slug: string): Project | undefined {
+  return projects.find((project) => project.slug === slug);
+}
 
 export const blogPosts = [
   {
