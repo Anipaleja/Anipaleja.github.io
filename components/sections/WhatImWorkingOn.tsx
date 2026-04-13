@@ -24,12 +24,29 @@ type GitHubCommit = {
   };
 };
 
+type GitHubCommitDetails = {
+  stats?: {
+    additions?: number;
+    deletions?: number;
+  };
+};
+
+type GitHubLanguages = Record<string, number>;
+
 type RecentCommit = {
   sha: string;
   message: string;
   repoName: string;
   committedAt: string;
   url: string;
+  additions?: number;
+  deletions?: number;
+};
+
+type LanguageUsage = {
+  name: string;
+  bytes: number;
+  percent: number;
 };
 
 type MediumPost = {
@@ -49,6 +66,16 @@ const CLICKS_COUNTER_KEY = "site_clicks";
 const ACCENT_STORAGE_KEY = "ap-accent-color";
 const GRAPH_COLOR_STORAGE_KEY = "ap-graph-color";
 const MEDIUM_FEED_URL = "https://medium.com/feed/@anipaleja";
+const LANGUAGE_COLORS = [
+  "#2E86AB",
+  "#F18F01",
+  "#C73E1D",
+  "#6A994E",
+  "#7B2CBF",
+  "#0B6E4F",
+  "#E36414",
+  "#3A86FF",
+];
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
 const supabase =
@@ -149,7 +176,38 @@ async function getRecentCommits(): Promise<RecentCommit[]> {
       return true;
     });
 
-    return deduplicated.slice(0, MAX_COMMITS);
+    const topCommits = deduplicated.slice(0, MAX_COMMITS);
+    const withStats = await Promise.all(
+      topCommits.map(async (commit) => {
+        try {
+          const detailsResponse = await fetch(
+            `https://api.github.com/repos/${commit.repoName}/commits/${commit.sha}`,
+            {
+              headers: {
+                Accept: "application/vnd.github+json",
+              },
+              cache: "no-store",
+            },
+          );
+
+          if (!detailsResponse.ok) {
+            return commit;
+          }
+
+          const details = (await detailsResponse.json()) as GitHubCommitDetails;
+
+          return {
+            ...commit,
+            additions: details.stats?.additions,
+            deletions: details.stats?.deletions,
+          };
+        } catch {
+          return commit;
+        }
+      }),
+    );
+
+    return withStats;
   } catch {
     try {
       const response = await fetch(`https://api.github.com/users/${USERNAME}/events/public?per_page=100`, {
@@ -202,6 +260,72 @@ async function getRecentCommits(): Promise<RecentCommit[]> {
     } catch {
       return [];
     }
+  }
+}
+
+async function getLanguageUsage(): Promise<LanguageUsage[]> {
+  try {
+    const reposResponse = await fetch(
+      `https://api.github.com/users/${USERNAME}/repos?per_page=100&sort=updated&direction=desc`,
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+        },
+        cache: "no-store",
+      },
+    );
+
+    if (!reposResponse.ok) {
+      return [];
+    }
+
+    const repos = ((await reposResponse.json()) as GitHubRepo[])
+      .filter((repo) => !repo.fork)
+      .slice(0, REPO_SAMPLE_SIZE);
+
+    const languageMaps = await Promise.all(
+      repos.map(async (repo) => {
+        try {
+          const response = await fetch(`https://api.github.com/repos/${repo.full_name}/languages`, {
+            headers: {
+              Accept: "application/vnd.github+json",
+            },
+            cache: "no-store",
+          });
+
+          if (!response.ok) {
+            return {} as GitHubLanguages;
+          }
+
+          return (await response.json()) as GitHubLanguages;
+        } catch {
+          return {} as GitHubLanguages;
+        }
+      }),
+    );
+
+    const totals = new Map<string, number>();
+    for (const languageMap of languageMaps) {
+      for (const [language, bytes] of Object.entries(languageMap)) {
+        totals.set(language, (totals.get(language) ?? 0) + bytes);
+      }
+    }
+
+    const totalBytes = Array.from(totals.values()).reduce((sum, value) => sum + value, 0);
+    if (totalBytes === 0) {
+      return [];
+    }
+
+    return Array.from(totals.entries())
+      .map(([name, bytes]) => ({
+        name,
+        bytes,
+        percent: (bytes / totalBytes) * 100,
+      }))
+      .sort((a, b) => b.bytes - a.bytes)
+      .slice(0, 8);
+  } catch {
+    return [];
   }
 }
 
@@ -301,6 +425,8 @@ export function WhatImWorkingOn() {
   const [graphDraft, setGraphDraft] = useState("#0059ff");
   const [mediumPosts, setMediumPosts] = useState<MediumPost[]>([]);
   const [isMediumLoading, setIsMediumLoading] = useState(true);
+  const [languageUsage, setLanguageUsage] = useState<LanguageUsage[]>([]);
+  const [isLanguageLoading, setIsLanguageLoading] = useState(true);
 
   useEffect(() => {
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY) as ThemePreset["id"] | null;
@@ -341,6 +467,27 @@ export function WhatImWorkingOn() {
     };
 
     void loadClicks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadLanguageUsage = async () => {
+      const usage = await getLanguageUsage();
+
+      if (!isMounted) {
+        return;
+      }
+
+      setLanguageUsage(usage);
+      setIsLanguageLoading(false);
+    };
+
+    void loadLanguageUsage();
 
     return () => {
       isMounted = false;
@@ -681,9 +828,12 @@ export function WhatImWorkingOn() {
                     className="flex items-start justify-between gap-3 border-2 border-[var(--line)] bg-[var(--bg)] px-3 py-2 transition hover:-translate-y-0.5 hover:translate-x-0.5"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-[var(--text)]">{cleanMessage(commit.message)}</p>
+                      <p className="text-sm font-semibold text-[var(--text)]">{cleanMessage(commit.message)}</p>
                       <p className="mt-1 text-xs text-[var(--muted)]">
-                        {String(index + 1).padStart(2, "0")} • {commit.repoName}
+                        {String(index + 1).padStart(2, "0")} • {commit.repoName} • {commit.sha.slice(0, 7)}
+                      </p>
+                      <p className="mt-1 text-xs text-[var(--muted)]">
+                        +{commit.additions ?? 0} / -{commit.deletions ?? 0}
                       </p>
                     </div>
                     <span className="whitespace-nowrap text-xs text-[var(--muted)]">{formatCommitDate(commit.committedAt)}</span>
@@ -692,6 +842,47 @@ export function WhatImWorkingOn() {
               ))}
             </ol>
           )}
+
+          <div className="mt-5 border-t-2 border-[var(--line)] pt-4">
+            <p className="eyebrow">Language usage</p>
+            {isLanguageLoading ? (
+              <p className="mt-3 text-sm text-[var(--text)]">Loading language usage...</p>
+            ) : languageUsage.length === 0 ? (
+              <p className="mt-3 text-sm text-[var(--text)]">Could not load language usage right now.</p>
+            ) : (
+              <>
+                <div className="mt-3 h-4 overflow-hidden rounded border border-[var(--line)] bg-[#f7f7f2]">
+                  <div className="flex h-full w-full">
+                    {languageUsage.map((language, index) => (
+                      <div
+                        key={language.name}
+                        title={`${language.name}: ${language.percent.toFixed(1)}%`}
+                        style={{
+                          width: `${language.percent}%`,
+                          backgroundColor: LANGUAGE_COLORS[index % LANGUAGE_COLORS.length],
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <ul className="mt-3 grid gap-1 text-xs text-[var(--text)] sm:grid-cols-2">
+                  {languageUsage.map((language, index) => (
+                    <li key={language.name} className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="h-2.5 w-2.5 border border-[var(--line)]"
+                          style={{ backgroundColor: LANGUAGE_COLORS[index % LANGUAGE_COLORS.length] }}
+                        />
+                        {language.name}
+                      </span>
+                      <span className="font-semibold">{language.percent.toFixed(1)}%</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="warm-card p-5 md:p-7">

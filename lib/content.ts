@@ -218,6 +218,7 @@ export const skills = {
 
 export const socialLinks = [
   { label: "GitHub", href: "https://github.com/anipaleja" },
+  { label: "X", href: "https://x.com/Anipaleja" },
   { label: "LinkedIn", href: "https://linkedin.com/in/anish-paleja" },
   { label: "Medium", href: "https://medium.com/@anipaleja" },
   { label: "Hugging Face", href: "https://huggingface.co/Anipal" },
