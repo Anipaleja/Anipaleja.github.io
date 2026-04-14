@@ -36,6 +36,9 @@ yarn-error.log*
 # supabase local state
 supabase/.temp/
 
+# local cloned source used to copy flappy bird assets
+/flappy-bird/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
