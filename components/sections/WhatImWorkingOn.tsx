@@ -612,13 +612,13 @@ export function WhatImWorkingOn() {
   }, []);
 
   return (
-    <section id="working-on" className="section-shell py-10 md:py-16">
+    <section id="working-on" className="section-shell py-8 md:py-16">
       <div className="md:ml-16">
         <p className="eyebrow">What I&apos;m Working On</p>
-        <h2 className="mt-2 text-3xl italic sm:text-4xl md:text-5xl">Shipping in public, one commit at a time.</h2>
+        <h2 className="mt-2 text-2xl italic sm:text-4xl md:text-5xl">Shipping in public, one commit at a time.</h2>
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid gap-6 md:grid-cols-2 2xl:grid-cols-4">
         <div className="warm-card p-5 md:p-6 lg:col-span-1">
           <div className="flex items-center justify-between">
             <p className="eyebrow">Theme</p>
@@ -825,18 +825,20 @@ export function WhatImWorkingOn() {
                     href={commit.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-start justify-between gap-3 border-2 border-[var(--line)] bg-[var(--bg)] px-3 py-2 transition hover:-translate-y-0.5 hover:translate-x-0.5"
+                    className="flex flex-col gap-2 border-2 border-[var(--line)] bg-[var(--bg)] px-3 py-2 transition hover:-translate-y-0.5 hover:translate-x-0.5 sm:flex-row sm:items-start sm:justify-between"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-[var(--text)]">{cleanMessage(commit.message)}</p>
                       <p className="mt-1 text-xs text-[var(--muted)]">
                         {String(index + 1).padStart(2, "0")} • {commit.repoName} • {commit.sha.slice(0, 7)}
                       </p>
-                      <p className="mt-1 text-xs text-[var(--muted)]">
-                        +{commit.additions ?? 0} / -{commit.deletions ?? 0}
+                      <p className="mt-1 text-xs">
+                        <span className="font-semibold text-[#2f9e44]">+{commit.additions ?? 0}</span>
+                        <span className="text-[var(--muted)]"> / </span>
+                        <span className="font-semibold text-[#c92a2a]">-{commit.deletions ?? 0}</span>
                       </p>
                     </div>
-                    <span className="whitespace-nowrap text-xs text-[var(--muted)]">{formatCommitDate(commit.committedAt)}</span>
+                    <span className="text-xs text-[var(--muted)] sm:whitespace-nowrap">{formatCommitDate(commit.committedAt)}</span>
                   </a>
                 </li>
               ))}
@@ -907,10 +909,10 @@ export function WhatImWorkingOn() {
                   href={post.link}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-between gap-3 border-2 border-[var(--line)] bg-[var(--bg)] px-3 py-2 transition hover:-translate-y-0.5 hover:translate-x-0.5"
+                  className="flex flex-col gap-1 border-2 border-[var(--line)] bg-[var(--bg)] px-3 py-2 transition hover:-translate-y-0.5 hover:translate-x-0.5 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <span className="min-w-0 text-sm font-semibold leading-tight text-[var(--text)]">{post.title}</span>
-                  <span className="whitespace-nowrap text-xs text-[var(--muted)]">{post.date}</span>
+                  <span className="text-xs text-[var(--muted)] sm:whitespace-nowrap">{post.date}</span>
                 </a>
               </li>
             ))}
@@ -919,7 +921,7 @@ export function WhatImWorkingOn() {
         </div>
       </div>
 
-      <div className="mt-6 warm-card p-5 md:p-6">
+      <div className="mt-6 hidden warm-card p-5 md:block md:p-6">
         <div className="border-b-2 border-[var(--line)] pb-3">
           <p className="eyebrow">Contribution Graph</p>
         </div>
